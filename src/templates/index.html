@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index</title>
+    <link rel="stylesheet" href="/static/output.css" />
+  </head>
+  <body class="bg-gray-900"><script type="text/javascript">document.body.className += " hasJS";</script> 
+
+    <h1 class="text-4xl text-gray-50 text-center pt-20">
+      k8see-webui
+    </h1>
+    <hr class="w-80 m-auto" />
+
+    <div class="container h-50 bg-yellow-400 m-12 flex justify-left cursor-pointer rounded"     >
+      <form action="/" class="m-12">
+        <label for="search">Search:</label>
+        <input id="search" name="search" value="{{ .Search }}" class="rounded">
+        <br>
+        <label for="dbegin">Choose a time for your appointment:</label>
+        <input type="datetime-local" id="dbegin"  name="dbegin" value="{{.Dbegin.Format "2006-01-02T15:04"}}" min="{{.Dmin.Format "2006-01-02T15:04"}}" max="{{.Dmax.Format "2006-01-02T15:04"}}">
+        <br>
+        <label for="dend">Choose a time for your appointment:</label>
+        <input type="datetime-local" id="dend"  name="dend" value="{{.Dend.Format "2006-01-02T15:04"}}" min="{{.Dmin.Format "2006-01-02T15:04"}}" >
+        <br>
+
+        <label for="year">Reason :</label>
+        <select id="reason" name="reason" class="rounded">
+          <option value=""></option>
+          {{ range .Reasons }}
+            {{ if eq . $.ReasonSelected }}
+              <option value="{{ . }}" selected> {{ . }}</option>
+            {{ else }}
+              <option value="{{ . }}">{{ . }} </option>
+            {{ end }}
+          {{ end }}
+        </select> 
+        <br>
+
+        <label for="type">type :</label>
+        <select id="type" name="type" class="rounded">
+          <option value=""></option>
+          {{ range .Types }}
+            {{ if eq . $.TypeSelected }}
+              <option value="{{ . }}" selected> {{ . }}</option>
+            {{ else }}
+              <option value="{{ . }}">{{ . }} </option>
+            {{ end }}
+          {{ end }}
+        </select> 
+        <br>
+
+        <input type="submit" value="Submit" class="m-2 p-2 bg-gray-600 rounded" >
+        <a href="/" ><input type="button" value="Clear" class="m-2 p-2 bg-gray-600 rounded" ></a>
+      </form> 
+    </div>
+
+    
+
+    <div class="container flex justify-center mx-auto">
+      <div class="flex flex-col">
+        <div class="w-full">
+          <div class="border-b border-gray-200 shadow">
+            <table class="divide-y divide-gray-300 ">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-2 text-xs text-gray-500">Date</th>
+                  <th class="px-6 py-2 text-xs text-gray-500">Name</th>
+                  <th class="px-6 py-2 text-xs text-gray-500">Reason</th>
+                  <th class="px-6 py-2 text-xs text-gray-500">Type</th>
+                  <th class="px-6 py-2 text-xs text-gray-500">Message</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-300">
+                {{ range .Rows }}
+                  <tr class="whitespace-nowrap">
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        {{ .K8seventDate.Format "2006-01-02T15:04" }} 
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-900">
+                          {{ .K8seventName }} 
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-500">
+                          {{ .K8seventReason }} 
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                      {{ .K8seventType }} 
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                      {{ .K8seventMessage }} 
+                    </td>
+                  </tr>
+                {{ end }}
+                  
+              </tbody>
+            </table>
+          </div>
+      </div>
+    </div>
+  </div>
+    <br>
+
+    <div class="container w-50 bg-yellow-400 mx-auto flex justify-between cursor-pointer rounded"     >
+        {{  range $idx,$v := $.Pages }}
+            <div>
+              {{ if eq $idx $.Page }}<b><u>{{ end }}
+              <a href="/?page={{ $idx }}&search={{ $.Search }}&dbegin={{$.Dbegin.Format "2006-01-02T15:04"}}&dend={{$.Dend.Format "2006-01-02T15:04"}}&reason={{ $.ReasonSelected}}&type={{ $.TypeSelected}}">{{ . }}</a>
+              {{ if eq $idx $.Page }}</u></b>{{ end }}
+            </div>
+        {{ end }}
+    </div>
+
+  </body>
+</html>
