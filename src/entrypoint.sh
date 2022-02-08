@@ -11,10 +11,10 @@ function checkVarIsNotEmpty
   fi
 }
 
-checkVarIsNotEmpty $DBHOST
-checkVarIsNotEmpty $DBNAME
-checkVarIsNotEmpty $DBUSER
-checkVarIsNotEmpty $DBPASSWORD
+checkVarIsNotEmpty DBHOST
+checkVarIsNotEmpty DBNAME
+checkVarIsNotEmpty DBUSER
+checkVarIsNotEmpty DBPASSWORD
 
 cat > /opt/k8see-webui/conf.yaml <<EOF
 db:
