@@ -29,5 +29,6 @@ WORKDIR /opt/k8see-webui
 
 USER k8see
 
+EXPOSE 8081
 ENTRYPOINT ["/opt/k8see-webui/entrypoint.sh"]
 CMD [ "/opt/k8see-webui/k8see-webui","-f","/opt/k8see-webui/conf.yaml" ]
