@@ -65,6 +65,7 @@
             <table class="divide-y divide-gray-300 ">
               <thead class="bg-gray-50">
                 <tr>
+                  <th class="px-6 py-2 text-xs text-gray-500">Exported time</th>
                   <th class="px-6 py-2 text-xs text-gray-500">First Time Event</th>
                   <th class="px-6 py-2 text-xs text-gray-500">Time Event</th>
                   <th class="px-6 py-2 text-xs text-gray-500">Name</th>
@@ -77,26 +78,29 @@
                 {{ range .Rows }}
                   <tr class="whitespace-nowrap">
                     <td class="px-6 py-4 text-sm text-gray-500">
-                        {{ .K8seventFirstTs.Format "2006-01-02T15:04:05" }} 
+                      {{ .ExportedTime.Format "2006-01-02T15:04:05" }} 
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-500">
-                      {{ .K8seventTs.Format "2006-01-02T15:04:05" }} 
+                        {{ .FirstTime.Format "2006-01-02T15:04:05" }} 
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                      {{ .EventTime.Format "2006-01-02T15:04:05" }} 
                   </td>
                     <td class="px-6 py-4">
                         <div class="text-sm text-gray-900">
-                          {{ .K8seventName }} 
+                          {{ .Name }} 
                         </div>
                     </td>
                     <td class="px-6 py-4">
                         <div class="text-sm text-gray-500">
-                          {{ .K8seventReason }} 
+                          {{ .Reason }} 
                         </div>
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-500">
-                      {{ .K8seventType }} 
+                      {{ .Type }} 
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-500">
-                      {{ .K8seventMessage }} 
+                      {{ .Message }} 
                     </td>
                   </tr>
                 {{ end }}
