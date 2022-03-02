@@ -18,7 +18,7 @@ type rowK8sevents struct {
 	Message      string
 }
 
-func (s *appServer) GetMinDate() (time.Time, error) {
+func (s *appServer) getMinDate() (time.Time, error) {
 	var dbegin time.Time
 	rqt := "select min(firstTime) from k8sevents;"
 	rows, err := s.db.Query(rqt)
@@ -76,16 +76,33 @@ func (s *appServer) calcPages(nbResults int) []string {
 	// fmt.Println("nbresults=", nbResults)
 	// fmt.Println("nbresults/50=", nbResults/50)
 	nbPages := nbResults / 50
-
 	if nbResults%50 != 0 {
 		nbPages++
 	}
-
 	var res []string
 	for i := 0; i < nbPages-1; i++ {
 		res = append(res, strconv.Itoa(i))
 	}
 	return res
+}
+
+func (s *appServer) getDistinct(column string) (reasons []string, err error) {
+	rqt := "select distinct(" + column + ") from k8sevents order by 1"
+	rows, err := s.db.Query(rqt)
+	if err != nil {
+		return nil, err
+	} else {
+		defer rows.Close()
+		for rows.Next() {
+			var reason string
+			err = rows.Scan(&reason)
+			if err != nil {
+				return nil, err
+			}
+			reasons = append(reasons, reason)
+		}
+	}
+	return reasons, err
 }
 
 func (s *appServer) IndexHandler(response http.ResponseWriter, request *http.Request) {
@@ -106,13 +123,7 @@ func (s *appServer) IndexHandler(response http.ResponseWriter, request *http.Req
 	}
 	var data dataIndex
 	var err error
-
-	// fmt.Println("REASON=", request.FormValue("reason"))
-	// fmt.Println("TYPE=", request.FormValue("type"))
-	// fmt.Println("DEND=", request.FormValue("dend"))
-	// fmt.Println("DBEGIN=", request.FormValue("dbegin"))
-
-	data.Dmin, _ = s.GetMinDate()
+	data.Dmin, _ = s.getMinDate()
 	data.Dmax = time.Now()
 
 	if request.FormValue("type") != "" {
@@ -171,46 +182,20 @@ func (s *appServer) IndexHandler(response http.ResponseWriter, request *http.Req
 				panic(err)
 			}
 			data.Rows = append(data.Rows, rowRes)
-			// fmt.Println(rowRes)
-		}
-	}
-	// fmt.Println(len(data.Rows))
-	rqt = "select distinct(reason) from k8sevents order by 1"
-	rows, err = s.db.Query(rqt)
-	if err != nil {
-		var d dataErr
-		d.ErrorMsg = err.Error()
-		s.HandlerError(response, d)
-	} else {
-		defer rows.Close()
-		for rows.Next() {
-			var reason string
-			err = rows.Scan(&reason)
-			if err != nil {
-				panic(err)
-			}
-			data.Reasons = append(data.Reasons, reason)
-			// fmt.Println(rowRes)
 		}
 	}
 
-	rqt = "select distinct(type) from k8sevents order by 1"
-	rows, err = s.db.Query(rqt)
+	data.Reasons, err = s.getDistinct("reason")
 	if err != nil {
 		var d dataErr
 		d.ErrorMsg = err.Error()
 		s.HandlerError(response, d)
-	} else {
-		defer rows.Close()
-		for rows.Next() {
-			var k8stype string
-			err = rows.Scan(&k8stype)
-			if err != nil {
-				panic(err)
-			}
-			data.Types = append(data.Types, k8stype)
-			// fmt.Println(rowRes)
-		}
+	}
+	data.Types, err = s.getDistinct("type")
+	if err != nil {
+		var d dataErr
+		d.ErrorMsg = err.Error()
+		s.HandlerError(response, d)
 	}
 
 	err = tmplt.Execute(response, data)
