@@ -159,8 +159,13 @@ func (s *appServer) IndexHandler(response http.ResponseWriter, request *http.Req
 		}
 	}
 
-	tmplt := template.New("index.html")
-	tmplt, _ = tmplt.ParseFiles("./templates/index.html")
+	// Note the call to ParseFS instead of Parse
+	tmplt, err := template.ParseFS(htmlFiles, "templates/index.html")
+	if err != nil {
+		panic(err)
+	}
+	// tmplt := template.New("index.html")
+	// tmplt, _ = tmplt.ParseFiles("./templates/index.html")
 
 	rqt, rqtCnt := s.makeRqtEvents(data.Dbegin, data.Dend, request.FormValue("search"), request.FormValue("type"), request.FormValue("reason"), request.FormValue("message"), data.Page)
 
