@@ -12,6 +12,9 @@ The 3 tools are :
 
 **It's actually in development, not production ready**
 
+# Install 
+
+k8see-webui can be installed as a docker image only for now. [You can get kubernetes manifest here.](https://github.com/sgaunet/k8see-deploy)]
 
 # Development
 
