@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"io/fs"
 	"net/http"
 )
 
@@ -16,17 +14,17 @@ func (s *appServer) routes() {
 	// static := http.StripPrefix("/static/", fsStatic)
 	s.router.PathPrefix("/static").Handler(fsStatic)
 
-	tmplFiles, err := fs.ReadDir(staticCSS, "static")
-	if err != nil {
-		panic(err)
-	}
+	// tmplFiles, err := fs.ReadDir(staticCSS, "static")
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	for _, tmpl := range tmplFiles {
-		if tmpl.IsDir() {
-			continue
-		}
-		fmt.Println(tmpl.Name())
-	}
+	// for _, tmpl := range tmplFiles {
+	// 	if tmpl.IsDir() {
+	// 		continue
+	// 	}
+	// 	fmt.Println(tmpl.Name())
+	// }
 
 	s.router.HandleFunc("/", s.IndexHandler)
 }

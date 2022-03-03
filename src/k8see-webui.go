@@ -77,17 +77,13 @@ func main() {
 
 func cnxDB(cfgEnvCnx AppConfig) (*sql.DB, error) {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfgEnvCnx.Catsdb.Host, cfgEnvCnx.Catsdb.Port, cfgEnvCnx.Catsdb.User, cfgEnvCnx.Catsdb.Password, cfgEnvCnx.Catsdb.Dbname)
-	// fmt.Println(psqlInfo)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-		fmt.Println("Failed to connect to database")
-		os.Exit(1)
+		return nil, err
 	}
-
 	err = db.Ping()
 	if err != nil {
-		fmt.Println("Failed to connect to database")
-		os.Exit(1)
+		return nil, err
 	}
 	return db, err
 }

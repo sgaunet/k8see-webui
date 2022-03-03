@@ -73,8 +73,6 @@ func (s *appServer) makeRqtEvents(minDateTime time.Time, maxDateTime time.Time, 
 }
 
 func (s *appServer) calcPages(nbResults int) []string {
-	// fmt.Println("nbresults=", nbResults)
-	// fmt.Println("nbresults/50=", nbResults/50)
 	nbPages := nbResults / 50
 	if nbResults%50 != 0 {
 		nbPages++
