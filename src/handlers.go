@@ -1,9 +1,13 @@
 package main
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
+	"strings"
 	"text/template"
 	"time"
 )
@@ -36,9 +40,9 @@ func (s *appServer) getMinDate() (time.Time, error) {
 	return dbegin, err
 }
 
-func (s *appServer) nbResult(rqt string) (int, error) {
+func (s *appServer) nbResult(minDateTime time.Time, maxDateTime time.Time, searchName string, typeEvent string, reason string, message string, page int) (int, error) {
 	var cnt int
-	rows, err := s.db.Query(rqt)
+	rows, err := s.makeRqtEvents(true, minDateTime, maxDateTime, searchName, typeEvent, reason, message, page)
 	if err != nil {
 		return cnt, err
 	} else {
@@ -46,30 +50,75 @@ func (s *appServer) nbResult(rqt string) (int, error) {
 		for rows.Next() {
 			err = rows.Scan(&cnt)
 			if err != nil {
-				panic(err)
+				return 0, err
 			}
 		}
 	}
 	return cnt, err
 }
 
-func (s *appServer) makeRqtEvents(minDateTime time.Time, maxDateTime time.Time, searchName string, typeEvent string, reason string, message string, page int) (string, string) {
-	var limitClause string
-	whereClause := "where firstTime between '" + minDateTime.Format("2006-01-02 15:04") + "' and '" + maxDateTime.Format("2006-01-02 15:04") + "'"
-	if typeEvent != "" {
-		whereClause = whereClause + "and type='" + typeEvent + "'"
-	}
-	if reason != "" {
-		whereClause = whereClause + "and reason='" + reason + "'"
-	}
-	if searchName != "" {
-		whereClause = whereClause + "and name like '%" + searchName + "%'"
+func transformToCount(rqt string) string {
+	rqt = strings.ReplaceAll(rqt, "exportedTime,firstTime,eventTime,name,reason,type,message", "count(*)")
+	rqt = strings.ReplaceAll(rqt, "order by exportedTime desc", "")
+	return rqt
+}
+
+func (s *appServer) makeRqtEvents(countRequest bool, minDateTime time.Time, maxDateTime time.Time, searchName string, typeEvent string, reason string, message string, page int) (*sql.Rows, error) {
+	limitClause := fmt.Sprintf("limit %d offset %d", 50, (page)*50)
+
+	switch {
+	case typeEvent != "" && reason != "" && searchName != "":
+		rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents where type=$1 and reason=$2 and name like $3 and exportedTime between $4 and $5 order by exportedTime desc " + limitClause
+		if countRequest {
+			rqt = transformToCount(rqt)
+		}
+		return s.db.Query(rqt, typeEvent, reason, searchName, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
+	case typeEvent != "" && reason != "" && searchName == "":
+		rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents where type=$1 and reason=$2 and exportedTime between $3 and $4 order by exportedTime desc " + limitClause
+		if countRequest {
+			rqt = transformToCount(rqt)
+		}
+		return s.db.Query(rqt, typeEvent, reason, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
+	case typeEvent != "" && reason == "" && searchName != "":
+		rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents where type=$1 and name like $2 and exportedTime between $3 and $4 order by exportedTime desc " + limitClause
+		if countRequest {
+			rqt = transformToCount(rqt)
+		}
+		return s.db.Query(rqt, typeEvent, searchName, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
+	case typeEvent == "" && reason != "" && searchName != "":
+		rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents where reason=$1 and name like $2 and exportedTime between $3 and $4 order by exportedTime desc " + limitClause
+		if countRequest {
+			rqt = transformToCount(rqt)
+		}
+		return s.db.Query(rqt, reason, searchName, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
+	case typeEvent == "" && reason == "" && searchName != "":
+		rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents where name like $1 and exportedTime between $2 and $3 order by exportedTime desc " + limitClause
+		if countRequest {
+			rqt = transformToCount(rqt)
+		}
+		return s.db.Query(rqt, searchName, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
+	case typeEvent == "" && reason != "" && searchName == "":
+		rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents where reason=$1 and exportedTime between $2 and $3 order by exportedTime desc " + limitClause
+		if countRequest {
+			rqt = transformToCount(rqt)
+		}
+		return s.db.Query(rqt, reason, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
+	case typeEvent != "" && reason == "" && searchName == "":
+		rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents where type=$1 and exportedTime between $2 and $3 order by exportedTime desc " + limitClause
+		if countRequest {
+			rqt = transformToCount(rqt)
+		}
+		return s.db.Query(rqt, typeEvent, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
+	case typeEvent == "" && reason == "" && searchName == "":
+		rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents where exportedTime between $1 and $2 order by exportedTime desc " + limitClause
+		if countRequest {
+			rqt = transformToCount(rqt)
+		}
+		fmt.Println(rqt)
+		return s.db.Query(rqt, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
 	}
 
-	limitClause = fmt.Sprintf("limit %d offset %d", 50, (page)*50)
-	rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents " + whereClause + " order by exportedTime desc " + limitClause
-	rqtCnt := "select count(*) from k8sevents " + whereClause
-	return rqt, rqtCnt
+	return nil, errors.New("unknown case. Please create an issue on the github project")
 }
 
 func (s *appServer) calcPages(nbResults int) []string {
@@ -165,17 +214,21 @@ func (s *appServer) IndexHandler(response http.ResponseWriter, request *http.Req
 	// tmplt := template.New("index.html")
 	// tmplt, _ = tmplt.ParseFiles("./templates/index.html")
 
-	rqt, rqtCnt := s.makeRqtEvents(data.Dbegin, data.Dend, request.FormValue("search"), request.FormValue("type"), request.FormValue("reason"), request.FormValue("message"), data.Page)
+	// rqt, rqtCnt := s.makeRqtEvents(data.Dbegin, data.Dend, request.FormValue("search"), request.FormValue("type"), request.FormValue("reason"), request.FormValue("message"), data.Page)
 
-	nbResults, _ := s.nbResult(rqtCnt)
+	nbResults, err := s.nbResult(data.Dbegin, data.Dend, request.FormValue("search"), request.FormValue("type"), request.FormValue("reason"), request.FormValue("message"), data.Page)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+	}
 	data.NbResults = nbResults
 	data.Pages = s.calcPages(nbResults)
 
-	rows, err := s.db.Query(rqt)
+	rows, err := s.makeRqtEvents(false, data.Dbegin, data.Dend, request.FormValue("search"), request.FormValue("type"), request.FormValue("reason"), request.FormValue("message"), data.Page)
 	if err != nil {
 		var d dataErr
 		d.ErrorMsg = err.Error()
 		s.HandlerError(response, d)
+		return
 	} else {
 		defer rows.Close()
 		for rows.Next() {
