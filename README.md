@@ -22,3 +22,33 @@ k8see-webui can be installed as a docker image only for now. [You can get kubern
 
 The project is using tailwindcss. No need to update, very basic usage, but if you want to update this part, [you'll find more informations here.](docs/css/README.md)
 
+
+# Build
+
+This project is using :
+
+* golang 1.17+
+* [task for development](https://taskfile.dev/#/)
+* docker
+* [docker buildx](https://github.com/docker/buildx)
+* docker manifest
+* [goreleaser](https://goreleaser.com/)
+
+
+## Binary 
+
+```
+task
+```
+
+## Build the image
+
+```
+task image
+```
+
+# Make a release
+
+```
+task release
+```
