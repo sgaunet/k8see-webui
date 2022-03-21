@@ -1,15 +1,15 @@
-FROM golang:1.17.5-alpine AS builder
-LABEL stage=builder
+# FROM golang:1.17.5-alpine AS builder
+# LABEL stage=builder
 
-RUN apk add --no-cache git upx
-ENV GOPATH /go
-COPY src/ /go/src/
-WORKDIR /go/src/
+# RUN apk add --no-cache git upx
+# ENV GOPATH /go
+# COPY src/ /go/src/
+# WORKDIR /go/src/
 
-RUN echo $GOPATH
-RUN go get 
-RUN CGO_ENABLED=0 GOOS=linux go build . 
-RUN upx k8see-webui
+# RUN echo $GOPATH
+# RUN go get 
+# RUN CGO_ENABLED=0 GOOS=linux go build . 
+# RUN upx k8see-webui
 
 
 # FROM alpine:3.15.0 AS final
@@ -35,7 +35,7 @@ RUN upx k8see-webui
 
 FROM scratch AS final
 WORKDIR /
-COPY --from=builder /go/src/k8see-webui     /opt/k8see-webui/
+COPY k8see-webui     /opt/k8see-webui/
 COPY etc /etc
 EXPOSE 8081
 USER MyUser

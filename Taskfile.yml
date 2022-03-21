@@ -7,7 +7,6 @@ vars:
 
 tasks:
   default:
-    dir: src
     cmds:
       - go mod tidy
       - CGO_ENABLED=0 go build .
@@ -28,11 +27,9 @@ tasks:
       - docker push {{.IMG}}
 
   snapshot:
-    dir: src
     cmds:
       - GITLAB_TOKEN="" goreleaser --rm-dist --snapshot
     
   release:
-    dir: src
     cmds:
       - GITLAB_TOKEN="" goreleaser --rm-dist
