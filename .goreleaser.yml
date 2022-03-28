@@ -2,7 +2,7 @@ project_name: "k8see-webui"
 before:
   hooks:
     # You may remove this if you don't use go modules.
-    #- go mod download
+    - go mod download
     # you may remove this if you don't need go generate
     #- go generate ./...
 builds:
@@ -72,7 +72,6 @@ dockers:
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
     extra_files:
-    - src
     - etc
 
   - use: buildx
@@ -88,13 +87,12 @@ dockers:
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
     extra_files:
-    - src
     - etc
 
   - use: buildx
     goos: linux
     goarch: arm
-    goarm: 6
+    goarm: "6"
     image_templates:
       - "sgaunet/{{ .ProjectName }}:{{ .Version }}-armv6"
       - "sgaunet/{{ .ProjectName }}:latest-armv6"
@@ -105,13 +103,12 @@ dockers:
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
     extra_files:
-    - src
     - etc
 
   - use: buildx
     goos: linux
     goarch: arm
-    goarm: 7
+    goarm: "7"
     image_templates:
       - "sgaunet/{{ .ProjectName }}:{{ .Version }}-armv7"
       - "sgaunet/{{ .ProjectName }}:latest-armv7"
@@ -122,7 +119,6 @@ dockers:
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
     extra_files:
-    - src
     - etc
 
 docker_manifests:
