@@ -114,7 +114,7 @@ func (s *appServer) makeRqtEvents(countRequest bool, minDateTime time.Time, maxD
 		if countRequest {
 			rqt = transformToCount(rqt)
 		}
-		fmt.Println(rqt)
+		// fmt.Println(rqt)
 		return s.db.Query(rqt, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
 	}
 
