@@ -13,18 +13,5 @@ func (s *appServer) routes() {
 	fsStatic := http.FileServer(staticFS)
 	// static := http.StripPrefix("/static/", fsStatic)
 	s.router.PathPrefix("/static").Handler(fsStatic)
-
-	// tmplFiles, err := fs.ReadDir(staticCSS, "static")
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// for _, tmpl := range tmplFiles {
-	// 	if tmpl.IsDir() {
-	// 		continue
-	// 	}
-	// 	fmt.Println(tmpl.Name())
-	// }
-
 	s.router.HandleFunc("/", s.IndexHandler)
 }
