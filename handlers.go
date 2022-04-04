@@ -24,7 +24,7 @@ type rowK8sevents struct {
 
 func (s *appServer) getMinDate() (time.Time, error) {
 	var dbegin time.Time
-	rqt := "select min(firstTime) from k8sevents;"
+	rqt := "select min(exportedTime) from k8sevents;"
 	rows, err := s.db.Query(rqt)
 	if err != nil {
 		return dbegin, err
