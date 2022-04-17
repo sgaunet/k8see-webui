@@ -57,7 +57,8 @@ func (s *appServer) nbResult(minDateTime time.Time, maxDateTime time.Time, searc
 	return cnt, err
 }
 
-func transformToCount(rqt string) string {
+func transformToCount(rqt string, limitClause string) string {
+	rqt = strings.ReplaceAll(rqt, limitClause, "")
 	rqt = strings.ReplaceAll(rqt, "exportedTime,firstTime,eventTime,name,reason,type,message", "count(*)")
 	rqt = strings.ReplaceAll(rqt, "order by exportedTime desc", "")
 	return rqt
@@ -70,49 +71,49 @@ func (s *appServer) makeRqtEvents(countRequest bool, minDateTime time.Time, maxD
 	case typeEvent != "" && reason != "" && searchName != "":
 		rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents where type=$1 and reason=$2 and name like $3 and exportedTime between $4 and $5 order by exportedTime desc " + limitClause
 		if countRequest {
-			rqt = transformToCount(rqt)
+			rqt = transformToCount(rqt, limitClause)
 		}
 		return s.db.Query(rqt, typeEvent, reason, searchName, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
 	case typeEvent != "" && reason != "" && searchName == "":
 		rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents where type=$1 and reason=$2 and exportedTime between $3 and $4 order by exportedTime desc " + limitClause
 		if countRequest {
-			rqt = transformToCount(rqt)
+			rqt = transformToCount(rqt, limitClause)
 		}
 		return s.db.Query(rqt, typeEvent, reason, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
 	case typeEvent != "" && reason == "" && searchName != "":
 		rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents where type=$1 and name like $2 and exportedTime between $3 and $4 order by exportedTime desc " + limitClause
 		if countRequest {
-			rqt = transformToCount(rqt)
+			rqt = transformToCount(rqt, limitClause)
 		}
 		return s.db.Query(rqt, typeEvent, searchName, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
 	case typeEvent == "" && reason != "" && searchName != "":
 		rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents where reason=$1 and name like $2 and exportedTime between $3 and $4 order by exportedTime desc " + limitClause
 		if countRequest {
-			rqt = transformToCount(rqt)
+			rqt = transformToCount(rqt, limitClause)
 		}
 		return s.db.Query(rqt, reason, searchName, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
 	case typeEvent == "" && reason == "" && searchName != "":
 		rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents where name like $1 and exportedTime between $2 and $3 order by exportedTime desc " + limitClause
 		if countRequest {
-			rqt = transformToCount(rqt)
+			rqt = transformToCount(rqt, limitClause)
 		}
 		return s.db.Query(rqt, searchName, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
 	case typeEvent == "" && reason != "" && searchName == "":
 		rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents where reason=$1 and exportedTime between $2 and $3 order by exportedTime desc " + limitClause
 		if countRequest {
-			rqt = transformToCount(rqt)
+			rqt = transformToCount(rqt, limitClause)
 		}
 		return s.db.Query(rqt, reason, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
 	case typeEvent != "" && reason == "" && searchName == "":
 		rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents where type=$1 and exportedTime between $2 and $3 order by exportedTime desc " + limitClause
 		if countRequest {
-			rqt = transformToCount(rqt)
+			rqt = transformToCount(rqt, limitClause)
 		}
 		return s.db.Query(rqt, typeEvent, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
 	case typeEvent == "" && reason == "" && searchName == "":
 		rqt := "select exportedTime,firstTime,eventTime,name,reason,type,message from k8sevents where exportedTime between $1 and $2 order by exportedTime desc " + limitClause
 		if countRequest {
-			rqt = transformToCount(rqt)
+			rqt = transformToCount(rqt, limitClause)
 		}
 		// fmt.Println(rqt)
 		return s.db.Query(rqt, minDateTime.Format("2006-01-02 15:04"), maxDateTime.Format("2006-01-02 15:04"))
