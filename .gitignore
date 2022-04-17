@@ -1,3 +1,7 @@
 k8see-webui
 dist
 .task
+node_modules
+output-intermediate.css
+output-intermediate.css.map
+output.css.map

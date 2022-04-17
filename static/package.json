@@ -1,17 +1,17 @@
 {
-  "name": "sandbox",
+  "name": "k8see-webui",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "dependencies": {},
-  "devDependencies": {
-    "autoprefixer": "^10.3.1",
-    "postcss": "^8.3.6",
-    "tailwindcss": "^2.2.7"
-  },
   "scripts": {
-    "build": "tailwindcss build -i input.css -o output.css"
+    "build": "sass default.scss output.css -s compressed"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.1.3"
+  },
+  "devDependencies": {
+    "purgecss": "^4.1.3"
+  }
 }

@@ -7,10 +7,25 @@ vars:
 
 tasks:
   default:
+    deps:
+    - css
     cmds:
       - go mod tidy
       - CGO_ENABLED=0 go build .
       - upx ./{{.BINFILE}}
+    # silent: true
+    method: checksum
+    generates:
+      - "{{.BINFILE}}"
+
+  css:
+    cmds:
+      - cd static && npm run build
+
+  run:
+    cmds:
+      - go mod tidy
+      - CGO_ENABLED=0 go run . -f tst/conf.yaml
     # silent: true
     method: checksum
     generates:
