@@ -18,7 +18,7 @@ k8see-webui can be installed as a docker image only for now. [You can get kubern
 
 ## CSS
 
-The project is using tailwindcss. No need to update, very basic usage, but if you want to update this part, [you'll find more informations here.](docs/css/README.md)
+The project is using bootstrap v5. [you'll find more informations here.](static/README.md)
 
 
 # Build
