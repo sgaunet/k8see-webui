@@ -1,10 +1,10 @@
 module github.com/sgaunet/k8see-webui
 
-go 1.18
+go 1.19
 
 require (
 	github.com/gorilla/mux v1.8.0
-	github.com/lib/pq v1.10.6
+	github.com/lib/pq v1.10.7
 	gopkg.in/yaml.v2 v2.4.0
 )
 
