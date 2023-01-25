@@ -12,7 +12,7 @@ builds:
       - -X main.version={{.Version}}
     goos:
       - linux
-      - darwin
+      # - darwin
     goarch:
       - amd64
       - arm
@@ -25,21 +25,21 @@ builds:
     hooks:
       post:
         - upx "{{ .Path }}"
-  - env:
-      - CGO_ENABLED=0
-    ldflags:
-      - -X main.version={{.Version}}
-    goos:
-      - windows
-    goarch:
-      - amd64
-      - arm
-      - arm64
-    goarm:
-      - "6"
-      - "7"
-    # dir: src
-    id: win
+  # - env:
+  #     - CGO_ENABLED=0
+  #   ldflags:
+  #     - -X main.version={{.Version}}
+  #   goos:
+  #     - windows
+  #   goarch:
+  #     - amd64
+  #     - arm
+  #     - arm64
+  #   goarm:
+  #     - "6"
+  #     - "7"
+  #   # dir: src
+  #   id: win
 archives:
   - name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
     replacements:
