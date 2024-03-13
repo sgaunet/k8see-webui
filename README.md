@@ -1,4 +1,6 @@
 
+**k8see-webui is obsolete no time to improve it actually.**
+
 # k8see (Kubernetes Events Exporter)
 
 Kubernetes Events Exporter is a suit of three tools to export kubernertes events in an external database. The goal is to get events in an SQL DB to be able to analyze what happened.
